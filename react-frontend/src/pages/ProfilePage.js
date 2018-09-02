@@ -18,11 +18,11 @@ import Page from 'components/Page';
 
 const ProfilePage = () => {
   return (
-    <Page title="Forms" breadcrumbs={[{ name: 'Forms', active: true }]}>
+    <Page title="Edit Profile" breadcrumbs={[{ name: 'Profile', active: true }]}>
       <Row>
         <Col xl={{ size: 8, offset: 2 }} lg={12} md={12}>
           <Card>
-            <CardHeader>Form Grid</CardHeader>
+            <CardHeader>Edit Profile</CardHeader>
             <CardBody>
               <Form>
                 <FormGroup row>

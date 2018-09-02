@@ -48,15 +48,17 @@ class StatisticsPage extends Component {
   }
 
   deleteData(id){
+    console.log("schoolid=");
     console.log(this.state.school._id);
     axios.delete('http://localhost:4200/api/school/' + this.state.school._id + '/statistics/' + id)
-    .then(console.log('Deleted'))
+    .then(res => {this.forceUpdate();})
     .catch(err => console.log(err))
   }
 
-  handleDelete(event, data._id){
+  handleDelete(event){
     event.preventDefault();
-    this.deleteData(data._id);
+    const id = event.target.id.value;
+    this.deleteData(id);
     window.location.reload();
   }
 
@@ -77,7 +79,8 @@ class StatisticsPage extends Component {
             <td>{data.water_litres}</td>
             <td><Link to={"/school/"+this.id+"/edit/"+data._id} className="btn btn-primary">Edit</Link></td>
             <td>
-                <form onSubmit={this.handleDelete(data._id)}>
+                <form onSubmit={(event) => {this.handleDelete(event)}}>
+                    <input type="hidden" name="id" value={data._id} />
                     <input type="submit" value="Delete" className="btn btn-danger" />
                 </form>
             </td>
