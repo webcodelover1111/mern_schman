@@ -19,6 +19,8 @@ class StatisticsPage extends Component {
     this.getSchoolService = new SchoolService();
     this.tableRow = this.tableRow.bind(this);
     this.getData = this.getData.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
+    this.deleteData = this.deleteData.bind(this);
   }
 
   componentWillReceiveProps () {
@@ -45,6 +47,19 @@ class StatisticsPage extends Component {
     });
   }
 
+  deleteData(id){
+    console.log(this.state.school._id);
+    axios.delete('http://localhost:4200/api/school/' + this.state.school._id + '/statistics/' + id)
+    .then(console.log('Deleted'))
+    .catch(err => console.log(err))
+  }
+
+  handleDelete(event, data._id){
+    event.preventDefault();
+    this.deleteData(data._id);
+    window.location.reload();
+  }
+
   tableRow(){
     if (this.state.school.statistics instanceof Array) {
       return this.state.school.statistics.map(function (data, i) {
@@ -62,7 +77,7 @@ class StatisticsPage extends Component {
             <td>{data.water_litres}</td>
             <td><Link to={"/school/"+this.id+"/edit/"+data._id} className="btn btn-primary">Edit</Link></td>
             <td>
-                <form>
+                <form onSubmit={this.handleDelete(data._id)}>
                     <input type="submit" value="Delete" className="btn btn-danger" />
                 </form>
             </td>

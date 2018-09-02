@@ -250,7 +250,60 @@ const statisticsUpdateOne = function (req, res) {
 };
 
 const statisticsDeleteOne = function (req, res) {
-    res.json("You can create schools");
+    if (!req.params.schoolid || !req.params.statisticid) {
+        res
+            .status(404)
+            .json({
+                "message": "Not found, schoolid and statisticid are both required"
+            })
+        return;
+    }
+    School
+        .findById(req.params.schoolid)
+        .select('statistics')
+        .exec((err, school) => {
+            if (!school) {
+                res
+                    .status(404)
+                    .json({
+                        "message" : "schoolid not found"
+                    });
+                return;
+            } else if (err) {
+                res
+                    .status(400)
+                    .json(err);
+                return;
+            }
+            if (school.statistics && school.statistics.length > 0) {
+                if (!school.statistics.id(req.params.statisticid)) {
+                    res
+                        .status(404)
+                        .json({
+                            "message": "statisticid not found"
+                        });
+                } else {
+                    school.statistics.id(req.params.statisticid).remove();
+                    school.save((err) => {
+                        if (err) {
+                            res
+                                .status(404)
+                                .json(err);
+                        } else {
+                            res
+                                .status(204)
+                                .json(null);
+                        }
+                    });
+                }
+            } else {
+                res
+                    .status(404)
+                    .json({
+                        "message": "No statistic to delete"
+                    });
+            }
+        });
 };
 
 module.exports = {
