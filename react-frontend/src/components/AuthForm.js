@@ -1,7 +1,7 @@
 import logo200Image from 'assets/img/logo/logo_200.png';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, Form, FormGroup, Input, Label } from 'reactstrap';
+import { Button, Form, FormGroup, Input, Label, } from 'reactstrap';
 
 // additionally created imports
 import { connect } from 'react-redux';
@@ -11,7 +11,11 @@ class AuthForm extends React.Component {
   constructor(props) {
     super(props);
 
+    //reset login status
+
     this.state = {
+      activeTab: 'login',
+
       user: {
         firstName: '' ,
         lastName: '',
@@ -19,14 +23,13 @@ class AuthForm extends React.Component {
         password: ''
       },
       confirmPassword: '',
-      username: '',
-      password: '',
-      submitted: false,
+      loginusername: '',
+      loginpassword: '',
+      signupSubmitted: false,
       loginSubmitted: false
     };
 
     this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   get isLogin() {
@@ -41,15 +44,11 @@ class AuthForm extends React.Component {
     event.preventDefault();
 
     this.props.onChangeAuthState(authState);
-  };
+    };
 
   handleChange = event => {
     const { name, value } = event.target;
     const { user } = this.state;
-
-    if (this.isLogin) {
-      this.setState({ [name]: value });
-    }
 
     if (this.isSignup) {
       this.setState({
@@ -59,40 +58,49 @@ class AuthForm extends React.Component {
         }
       });      
     }
+    console.log("username");
+    console.log(this.state.user.username);
 
+  }
+
+  loginHandleChange = event => {
+    const { name, value } = event.target;
+    this.setState({ [name]: value });
+    console.log("this.state.loginusername");
+    console.log(this.state);
   }
 
   handleCPChange = event => {
     this.setState({confirmPassword: event.target.value});
   }
 
-  handleSubmit = event => {
+  signupSubmit = event => {
     event.preventDefault();
-    
-    if (this.isSignup) {
-     
+ 
       if (this.state.confirmPassword === this.state.user.password) {
-        this.setState({ submitted: true });
+        this.setState({ signupSubmitted: true });
         const { user } = this.state;
         const { dispatch } = this.props;
         if (user.firstName && user.lastName && user.username && user.password) {
           dispatch(userActions.register(user));
-        }
+          this.changeAuthState(STATE_LOGIN);
+        }        
       } else {
         alert("password is not coincident");
       }
-    }
 
-    if (this.isLogin) {
-      this.setState({ loginSubmitted: true });
-      const { username, password } = this.state;
-      const { dispatch } = this.props;
-      if (username && password) {
-          dispatch(userActions.login(username, password));
-      }
+    this.changeAuthState();    
+  }
+
+  loginSubmit = event => {
+    event.preventDefault();
+    this.setState({ loginSubmitted: true });
+    const { loginusername, loginpassword } = this.state;
+    const { dispatch } = this.props;
+    if (loginusername && loginpassword) {
+        dispatch(userActions.login(loginusername, loginpassword));
     }
-    
-  };
+  }
 
   renderButtonText() {
     const { buttonText } = this.props;
@@ -121,123 +129,158 @@ class AuthForm extends React.Component {
       passwordInputProps,
       confirmPasswordLabel,
       confirmPasswordInputProps,
+      loginusernameLabel,
+      loginusernameInputProps,
+      loginpasswordLabel,
+      loginpasswordInputProps,
       children,
       onLogoClick,
-      registering
     } = this.props;
-    const { user, submitted, confirmPassword, loginSubmitted } = this.state;
+    const { user, signupSubmitted, confirmPassword, loginSubmitted, loginusername, loginpassword } = this.state;
     return (
-      <Form onSubmit={this.handleSubmit}>
-        {showLogo && (
-          <div className="text-center pb-4">
-            <img
-              src={logo200Image}
-              className="rounded"
-              style={{ width: 60, height: 60, cursor: 'pointer' }}
-              alt="logo"
-              onClick={onLogoClick}
-            />
-          </div>
-        )}
+      <div>
         {this.isSignup && (
-          <FormGroup className={'form-group' + (submitted && !user.firstName ? ' has-error' : '')}>
-            <Label for={firstNameLabel}>{firstNameLabel}</Label>
-            <Input {...firstNameInputProps} onChange={this.handleChange} />
-            {submitted && !user.firstName &&
-                <div className="help-block">First Name is required</div>
-            }
-          </FormGroup>
-        )}
-        {this.isSignup && (
-          <FormGroup className={'form-group' + (submitted && !user.firstName ? ' has-error' : '')}>
-            <Label for={lastNameLabel}>{lastNameLabel}</Label>
-            <Input {...lastNameInputProps} onChange={this.handleChange} />
-            {submitted && !user.lastName &&
-              <div className="help-block">Last Name is required</div>
-            }
-          </FormGroup>
+          <Form onSubmit={this.signupSubmit}>
+          {showLogo && (
+            <div className="text-center pb-4">
+              <img
+                src={logo200Image}
+                className="rounded"
+                style={{ width: 60, height: 60, cursor: 'pointer' }}
+                alt="logo"
+                onClick={onLogoClick}
+              />
+            </div>
+          )}
+            <FormGroup className={'form-group' + (signupSubmitted && !user.firstName ? ' has-error' : '')}>
+              <Label for={firstNameLabel}>{firstNameLabel}</Label>
+              <Input {...firstNameInputProps} onChange={this.handleChange} />
+              {signupSubmitted && !user.firstName &&
+                  <div className="help-block">First Name is required</div>
+              }
+            </FormGroup>
+            <FormGroup className={'form-group' + (signupSubmitted && !user.lastName ? ' has-error' : '')}>
+              <Label for={lastNameLabel}>{lastNameLabel}</Label>
+              <Input {...lastNameInputProps} onChange={this.handleChange} />
+              {signupSubmitted && !user.lastName &&
+                <div className="help-block">Last Name is required</div>
+              }
+            </FormGroup>
+            <FormGroup className={'form-group' + (signupSubmitted && !user.username ? ' has-error' : '')}>
+              <Label for={usernameLabel}>{usernameLabel}</Label>
+              <Input {...usernameInputProps} onChange={this.handleChange} />
+              {signupSubmitted && !user.username &&
+                  <div className="help-block">Username is required</div>
+              }
+            </FormGroup>
+            <FormGroup className={'form-group' + (signupSubmitted && !user.loginpassword ? ' has-error' : '')}>
+              <Label for={passwordLabel}>{passwordLabel}</Label>
+              <Input {...passwordInputProps} onChange={this.handleChange} />
+              {signupSubmitted && !user.password &&
+                  <div className="help-block">Password is required</div>
+              }
+            </FormGroup>          
+            <FormGroup className={'form-group' + (signupSubmitted && !user.confirmPassword ? ' has-error' : '')}>
+              <Label for={confirmPasswordLabel}>{confirmPasswordLabel}</Label>
+              <Input {...confirmPasswordInputProps} onChange={this.handleCPChange} />
+              {signupSubmitted && !confirmPassword &&
+                  <div className="help-block">ConfirmPassword is required</div>
+              }
+            </FormGroup>
+            <FormGroup check>
+              <Label check>
+                <Input type="checkbox" />{' '}
+                {this.isSignup ? 'Agree the terms and policy' : 'Remember me'}
+              </Label>
+            </FormGroup>
+            <hr />
+            <Button
+              size="lg"
+              className="bg-gradient-theme-left border-0"
+              block
+              onClick={this.signupSubmit}>
+              {this.renderButtonText()}
+            </Button>
 
+            <div className="text-center pt-1">
+              <h6>or</h6>
+              <h6>
+                {this.isSignup ? (
+                  <a href="#login" onClick={this.changeAuthState(STATE_LOGIN)}>
+                    Login
+                  </a>
+                ) : (
+                  <a href="#signup" onClick={this.changeAuthState(STATE_SIGNUP)}>
+                    Signup
+                  </a>
+                )}
+              </h6>
+            </div>
+          {children}
+        </Form>
         )}
-        {this.isSignup && (
-          <FormGroup className={'form-group' + (submitted && !user.firstName ? ' has-error' : '')}>
-            <Label for={usernameLabel}>{usernameLabel}</Label>
-            <Input {...usernameInputProps} onChange={this.handleChange} />
-            {submitted && !user.username &&
-                <div className="help-block">Username is required</div>
-            }
-          </FormGroup>
-        )}
-        {this.isSignup && (
-          <FormGroup className={'form-group' + (submitted && !user.firstName ? ' has-error' : '')}>
-            <Label for={passwordLabel}>{passwordLabel}</Label>
-            <Input {...passwordInputProps} onChange={this.handleChange} />
-            {submitted && !user.password &&
-                <div className="help-block">Password is required</div>
-            }
-          </FormGroup>          
-        )}
-
-        {this.isSignup && (
-          <FormGroup className={'form-group' + (submitted && !user.firstName ? ' has-error' : '')}>
-            <Label for={confirmPasswordLabel}>{confirmPasswordLabel}</Label>
-            <Input {...confirmPasswordInputProps} onChange={this.handleCPChange} />
-            {submitted && !confirmPassword &&
-                <div className="help-block">ConfirmPassword is required</div>
-            }
-          </FormGroup>
-        )}
-        
         {this.isLogin && (
-          <FormGroup className={'form-group' + (loginSubmitted && !user.firstName ? ' has-error' : '')}>
-            <Label for={usernameLabel}>{usernameLabel}</Label>
-            <Input {...usernameInputProps} onChange={this.handleChange} />
-            {loginSubmitted && !user.username &&
-                <div className="help-block">Username is required</div>
-            }
-          </FormGroup>
+          <Form onSubmit={this.loginSubmit}>
+          {showLogo && (
+            <div className="text-center pb-4">
+              <img
+                src={logo200Image}
+                className="rounded"
+                style={{ width: 60, height: 60, cursor: 'pointer' }}
+                alt="logo"
+                onClick={onLogoClick}
+              />
+            </div>
+          )}
+            <FormGroup className={'form-group' + (loginSubmitted && !loginusername ? ' has-error' : '')}>
+              <Label for={loginusernameLabel}>{loginusernameLabel}</Label>
+              <Input {...loginusernameInputProps} onChange={this.loginHandleChange} />
+              {loginSubmitted && !loginusername &&
+                  <div className="help-block">Username is required</div>
+              }
+            </FormGroup>
+            <FormGroup className={'form-group' + (loginSubmitted && !loginpassword ? ' has-error' : '')}>
+              <Label for={loginpasswordLabel}>{loginpasswordLabel}</Label>
+              <Input {...loginpasswordInputProps} onChange={this.loginHandleChange} />
+              {loginSubmitted && !loginpassword &&
+                  <div className="help-block">Password is required</div>
+              }
+            </FormGroup>          
+            <FormGroup check>
+              <Label check>
+                <Input type="checkbox" />{' '}
+                {this.isSignup ? 'Agree the terms and policy' : 'Remember me'}
+              </Label>
+            </FormGroup>
+            <hr />
+            <Button
+              size="lg"
+              className="bg-gradient-theme-left border-0"
+              block
+              onClick={this.loginSubmit}>
+              {this.renderButtonText()}
+            </Button>
+
+            <div className="text-center pt-1">
+              <h6>or</h6>
+              <h6>
+                {this.isSignup ? (
+                  <a href="#login" onClick={this.changeAuthState(STATE_LOGIN)}>
+                    Login
+                  </a>
+                ) : (
+                  <a href="#signup" onClick={this.changeAuthState(STATE_SIGNUP)}>
+                    Signup
+                  </a>
+                )}
+              </h6>
+            </div>
+            {children}
+        </Form>
         )}
+      </div>
+      
 
-        {this.isLogin && (
-          <FormGroup className={'form-group' + (loginSubmitted && !user.firstName ? ' has-error' : '')}>
-            <Label for={passwordLabel}>{passwordLabel}</Label>
-            <Input {...passwordInputProps} onChange={this.handleChange} />
-            {loginSubmitted && !user.password &&
-                <div className="help-block">Password is required</div>
-            }
-          </FormGroup>          
-        )}
-        <FormGroup check>
-          <Label check>
-            <Input type="checkbox" />{' '}
-            {this.isSignup ? 'Agree the terms and policy' : 'Remember me'}
-          </Label>
-        </FormGroup>
-        <hr />
-        <Button
-          size="lg"
-          className="bg-gradient-theme-left border-0"
-          block
-          onClick={this.handleSubmit}>
-          {this.renderButtonText()}
-        </Button>
-
-        <div className="text-center pt-1">
-          <h6>or</h6>
-          <h6>
-            {this.isSignup ? (
-              <a href="#login" onClick={this.changeAuthState(STATE_LOGIN)}>
-                Login
-              </a>
-            ) : (
-              <a href="#signup" onClick={this.changeAuthState(STATE_SIGNUP)}>
-                Signup
-              </a>
-            )}
-          </h6>
-        </div>
-
-        {children}
-      </Form>
     );
   }
 }
@@ -258,6 +301,10 @@ AuthForm.propTypes = {
   passwordInputProps: PropTypes.object,
   confirmPasswordLabel: PropTypes.string,
   confirmPasswordInputProps: PropTypes.object,
+  loginusernameLabel: PropTypes.string,
+  loginusernameInputProps: PropTypes.object,
+  loginpasswordLabel: PropTypes.string,
+  loginpasswordInputProps:PropTypes.object,
   onLogoClick: PropTypes.func,
 };
 
@@ -295,6 +342,20 @@ AuthForm.defaultProps = {
     type: 'password',
     placeholder: 'confirm your password',
     name: 'confirmPassword',
+    required: 'required'
+  },
+  loginusernameLabel: 'Username',
+  loginusernameInputProps: {
+    type: 'text',
+    placeholder: 'John@doe.com',
+    name: 'loginusername',
+    required: 'required'
+  },
+  loginpasswordLabel: 'Password',
+  loginpasswordInputProps: {
+    type: 'password',
+    placeholder: 'your password',
+    name: 'loginpassword',
     required: 'required'
   },
   onLogoClick: () => {},

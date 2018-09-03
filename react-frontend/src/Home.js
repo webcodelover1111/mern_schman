@@ -46,7 +46,7 @@ const getBasename = () => {
   return `/${process.env.PUBLIC_URL.split('/').pop()}`;
 };
 
-class App extends React.Component {
+class Home extends React.Component {
   constructor(props) {
     super(props);
 
@@ -275,5 +275,5 @@ function mapStateToProps(state) {
   };
 }
 
-const connectedApp = connect(mapStateToProps)(App);
-export { connectedApp as App };
+const connectedApp = connect(mapStateToProps)(Home);
+export { connectedApp as Home };
