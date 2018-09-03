@@ -32,17 +32,18 @@ import UsersPage from './pages/UsersPage';
 import HomePage from './pages/HomePage';
 import StatisticsPage from './pages/StatisticsPage';
 import EditDataPage from './pages/EditDataPage';
-// import {
-//   BrowserRouter as Router,
-//   Route,
-//   Link
-// } from 'react-router-dom';
+
+// added files concerned with authentication
 
 const getBasename = () => {
   return `/${process.env.PUBLIC_URL.split('/').pop()}`;
 };
 
 class App extends React.Component {
+  // constructor(props) {
+  //   super(props);
+
+  // }
   render() {
     return (
       <BrowserRouter basename={getBasename()}>
