@@ -50,20 +50,36 @@ class App extends React.Component {
   constructor(props) {
     super(props);
 
-    const { dispatch } = this.props;
+    // const { dispatch } = this.props;
     history.listen((location, action) => {
       // clear alert on location change
-      dispatch(alertActions.clear());
+      // dispatch(alertActions.clear());
     });
 
   }
 
   render() {
-    const { alert } = this.props;
+    // const { alert } = this.props;
     return (
       <BrowserRouter basename={getBasename()}>
         <GAListener>
+            {/* {alert.message &&
+              <div className={`alert ${alert.type}`}>{alert.message}</div>
+            } */}
           <Switch>
+              {/* <LayoutRoute
+                exact
+                path="/login"
+                layout={EmptyLayout}
+                component={LoginPage}
+              />
+              <LayoutRoute
+                exact
+                path="/signup"
+                layout={EmptyLayout}
+                component={RegisterPage}/> */}
+            
+            
             <LayoutRoute
               exact
               path="/login"
@@ -80,6 +96,7 @@ class App extends React.Component {
                 <AuthPage {...props} authState={STATE_SIGNUP} />
               )}
             />
+            
             <LayoutRoute
               exact
               path="/login-modal"

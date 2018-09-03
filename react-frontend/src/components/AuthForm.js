@@ -3,7 +3,31 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Button, Form, FormGroup, Input, Label } from 'reactstrap';
 
+// additionally created imports
+import { connect } from 'react-redux';
+import { userActions } from '../authentication/_actions'
+
 class AuthForm extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      user: {
+        firstName: '' ,
+        lastName: '',
+        username: '',
+        password: ''
+      },
+      confirmPassword: '',
+      username: '',
+      password: '',
+      submitted: false
+    };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
   get isLogin() {
     return this.props.authState === STATE_LOGIN;
   }
@@ -18,8 +42,55 @@ class AuthForm extends React.Component {
     this.props.onChangeAuthState(authState);
   };
 
+  handleChange = event => {
+    const { name, value } = event.target;
+    const { user } = this.state;
+
+    if (this.isLogin) {
+      this.setState({ [name]: value });
+    }
+
+    if (this.isSignup) {
+      this.setState({
+        user: {
+          ...user,
+          [name]: value
+        }
+      });      
+    }
+
+  }
+
+  handleCPChange = event => {
+    this.setState({confirmPassword: event.target.value});
+  }
+
   handleSubmit = event => {
     event.preventDefault();
+    
+    if (this.isSignup) {
+     
+      if (this.state.confirmPassword === this.state.user.password) {
+        this.setState({ submitted: true });
+        const { user } = this.state;
+        const { dispatch } = this.props;
+        if (user.firstName && user.lastName && user.username && user.password) {
+          dispatch(userActions.register(user));
+        }
+      } else {
+        alert("password is not coincident");
+      }
+    }
+
+    if (this.isLogin) {
+      this.setState({ submitted: true });
+      const { username, password } = this.state;
+      const { dispatch } = this.props;
+      if (username && password) {
+          dispatch(userActions.login(username, password));
+      }
+    }
+    
   };
 
   renderButtonText() {
@@ -39,6 +110,10 @@ class AuthForm extends React.Component {
   render() {
     const {
       showLogo,
+      firstNameLabel,
+      firstNameInputProps,
+      lastNameLabel,
+      lastNameInputProps,
       usernameLabel,
       usernameInputProps,
       passwordLabel,
@@ -62,18 +137,30 @@ class AuthForm extends React.Component {
             />
           </div>
         )}
+        {this.isSignup && (
+          <FormGroup>
+            <Label for={firstNameLabel}>{firstNameLabel}</Label>
+            <Input {...firstNameInputProps} onChange={this.handleChange} />
+          </FormGroup>
+        )}
+        {this.isSignup && (
+          <FormGroup>
+            <Label for={lastNameLabel}>{lastNameLabel}</Label>
+            <Input {...lastNameInputProps} onChange={this.handleChange} />
+          </FormGroup>
+        )}
         <FormGroup>
           <Label for={usernameLabel}>{usernameLabel}</Label>
-          <Input {...usernameInputProps} />
+          <Input {...usernameInputProps} onChange={this.handleChange} />
         </FormGroup>
         <FormGroup>
           <Label for={passwordLabel}>{passwordLabel}</Label>
-          <Input {...passwordInputProps} />
+          <Input {...passwordInputProps} onChange={this.handleChange} />
         </FormGroup>
         {this.isSignup && (
           <FormGroup>
             <Label for={confirmPasswordLabel}>{confirmPasswordLabel}</Label>
-            <Input {...confirmPasswordInputProps} />
+            <Input {...confirmPasswordInputProps} onChange={this.handleCPChange} />
           </FormGroup>
         )}
         <FormGroup check>
@@ -118,6 +205,10 @@ export const STATE_SIGNUP = 'SIGNUP';
 AuthForm.propTypes = {
   authState: PropTypes.oneOf([STATE_LOGIN, STATE_SIGNUP]).isRequired,
   showLogo: PropTypes.bool,
+  firstNameLabel: PropTypes.string,
+  firstNameInputProps: PropTypes.object,
+  lastNameLabel: PropTypes.string,
+  lastNameInputProps: PropTypes.string,
   usernameLabel: PropTypes.string,
   usernameInputProps: PropTypes.object,
   passwordLabel: PropTypes.string,
@@ -130,20 +221,38 @@ AuthForm.propTypes = {
 AuthForm.defaultProps = {
   authState: 'LOGIN',
   showLogo: true,
+  firstNameLabel: 'Fistname',
+  firstNameInputProps: {
+    type: 'text',
+    placeholder: 'John',
+    name: 'firstName'
+  },
+  lastNameLabel: 'lastName',
+  lastNameInputProps: {
+    type: 'text',
+    placeholder: 'Doe',
+    name: 'lastName'
+  },
   usernameLabel: 'Email',
   usernameInputProps: {
     type: 'email',
     placeholder: 'your@email.com',
+    name: 'username',
+    required: 'required'
   },
   passwordLabel: 'Password',
   passwordInputProps: {
     type: 'password',
     placeholder: 'your password',
+    name: 'password',
+    required: 'required'
   },
   confirmPasswordLabel: 'Confirm Password',
   confirmPasswordInputProps: {
     type: 'password',
     placeholder: 'confirm your password',
+    name: 'confirmPassword',
+    required: 'required'
   },
   onLogoClick: () => {},
 };
