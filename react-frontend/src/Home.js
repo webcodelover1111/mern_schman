@@ -39,45 +39,17 @@ import {connect} from 'react-redux';
 import { history } from './authentication/_helpers';
 import { alertActions } from './authentication/_actions';
 import { PrivateRoute } from './authentication/_components';
-// import { LoginPage } from './authentication/LoginPage';
-// import { RegisterPage } from './authentication/RegisterPage';
 
 const getBasename = () => {
   return `/${process.env.PUBLIC_URL.split('/').pop()}`;
 };
 
 class Home extends React.Component {
-  constructor(props) {
-    super(props);
-
-    const { dispatch } = this.props;
-    history.listen((location, action) => {
-      // clear alert on location change
-      // dispatch(alertActions.clear());
-    });
-
-  }
-
   render() {
-    const { alert } = this.props;
     return (
       <BrowserRouter basename={getBasename()}>
         <GAListener>
-                {/* {alert.message &&
-                            <div className={`alert ${alert.type}`}>{alert.message}</div>
-                        } */}
           <Switch>
-              {/* <LayoutRoute
-                exact
-                path="/login"
-                layout={EmptyLayout}
-                component={LoginPage}
-              />
-              <LayoutRoute
-                exact
-                path="/signup"
-                layout={EmptyLayout}
-                component={RegisterPage}/> */}
 
             <LayoutRoute
               exact
@@ -266,7 +238,7 @@ const query = ({ width }) => {
   return { breakpoint: 'xs' };
 };
 
-export default componentQueries(query)(App);
+export default componentQueries(query)(Home);
 
 function mapStateToProps(state) {
   const { alert } = state;

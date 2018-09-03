@@ -36,6 +36,8 @@ import withBadge from 'hocs/withBadge';
 
 import { notificationsData } from 'demos/header';
 
+import { Link } from 'react-router-dom';
+
 const bem = bn.create('header');
 
 const MdNotificationsActiveWithBadge = withBadge({
@@ -160,7 +162,8 @@ class Header extends React.Component {
                       <MdHelp /> Help
                     </ListGroupItem>
                     <ListGroupItem tag="button" action className="border-light">
-                      <MdExitToApp /> Signout
+
+                      <MdExitToApp /> <Link to="/login">Signout</Link>
                     </ListGroupItem>
                   </ListGroup>
                 </UserCard>
