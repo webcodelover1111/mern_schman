@@ -21,7 +21,7 @@ import TypographyPage from 'pages/TypographyPage';
 import WidgetPage from 'pages/WidgetPage';
 import React from 'react';
 import componentQueries from 'react-component-queries';
-import { BrowserRouter, Redirect, Switch } from 'react-router-dom';
+import { BrowserRouter, Redirect, Switch, Router, Route } from 'react-router-dom';
 import './styles/reduction.css';
 
 // customized import details
@@ -34,17 +34,32 @@ import StatisticsPage from './pages/StatisticsPage';
 import EditDataPage from './pages/EditDataPage';
 
 // added files concerned with authentication
+import {connect} from 'react-redux';
+
+import { history } from './authentication/_helpers';
+import { alertActions } from './authentication/_actions';
+import { PrivateRoute } from './authentication/_components';
+import { LoginPage } from './authentication/LoginPage';
+import { RegisterPage } from './authentication/RegisterPage';
 
 const getBasename = () => {
   return `/${process.env.PUBLIC_URL.split('/').pop()}`;
 };
 
 class App extends React.Component {
-  // constructor(props) {
-  //   super(props);
+  constructor(props) {
+    super(props);
 
-  // }
+    const { dispatch } = this.props;
+    history.listen((location, action) => {
+      // clear alert on location change
+      dispatch(alertActions.clear());
+    });
+
+  }
+
   render() {
+    const { alert } = this.props;
     return (
       <BrowserRouter basename={getBasename()}>
         <GAListener>
@@ -236,3 +251,13 @@ const query = ({ width }) => {
 };
 
 export default componentQueries(query)(App);
+
+function mapStateToProps(state) {
+  const { alert } = state;
+  return {
+    alert
+  };
+}
+
+const connectedApp = connect(mapStateToProps)(App);
+export { connectedApp as App };
